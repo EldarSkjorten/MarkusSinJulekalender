@@ -1,3 +1,32 @@
+<!--
+  📌 JULEKALENDER – KORTVERSJON (se fullversjon i README.md)
+
+  1) Endre innhold:
+     - All tekst i lukene + Apple/Spotify-lenker ligger i: data/days.json
+     - Endre "text", "apple" og "spotify" for hver dag.
+     - Tom streng ("") skjuler knappen.
+
+  2) Info-teksten (i egen modal):
+     - Endres i index.html: konstanten INFO_TEXT (skriv vanlig tekst med linjeskift)
+
+  3) Testmodus:
+     - Øverst i scriptet: const DEBUG_ALWAYS_OPEN = true;
+     - true = alle luker åpne + liten TESTMODUS-markør vises
+     - false = ekte datostyring (basert på dagens systemdato)
+
+  4) Datostyring (når DEBUG_ALWAYS_OPEN = false):
+     - Før desember: alt lukket
+     - I desember: luke n åpnes når datoen >= n
+     - Etter desember: alle luker åpne igjen
+
+  5) Gjenbruk neste år / for en ny person:
+     - Kopiér index.html + data-mappen til et nytt repo
+     - Endre tittel, info-tekst og data/days.json
+     - Sett opp GitHub Pages i det nye repoet
+
+  ℹ️ Full forklaring (detaljert guide) ligger i README.md
+-->
+
 <!doctype html>
 <html lang="no">
 <head>
@@ -5,7 +34,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
   <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&display=swap" rel="stylesheet" />
-  <title>Markus sin Julekalender</title>
+  <title>Anniken sin Julekalender</title>
   <style>
     :root{
       /* Farger & fonter */
@@ -67,6 +96,8 @@
     @media (hover:hover){.info-btn:hover{transform:translateY(-1px);background:rgba(15,23,42,.8);box-shadow:0 6px 14px rgba(0,0,0,.6);}}
     .info-btn:focus-visible{outline:3px solid #22c55e;outline-offset:2px;}
 
+    .debug-indicator{margin-top:6px;text-align:center;font-size:.8rem;color:#f97316;opacity:.9;display:none}
+
     header,main{position:relative;z-index:1}
 
     /* Modal for åpne luker */
@@ -91,7 +122,7 @@
 <body>
   <div class="snow"></div>
   <header class="container">
-    <h1>🎄 Markus sin Julekalender</h1>
+    <h1>🎄 Anniken sin Julekalender</h1>
     <p>Et lite stykke musikk hver dag fram til jul. En del gleder og kanskje noen utfordringer?</p>
   </header>
 
@@ -99,6 +130,10 @@
     <button id="info-btn" class="info-btn" type="button" aria-label="Informasjon om julekalenderen">
       <span class="info-btn-inner">i</span>
     </button>
+  </div>
+
+  <div id="debug-indicator" class="debug-indicator" aria-hidden="true">
+    TESTMODUS – alle luker er åpne nå
   </div>
 
   <!-- Feil-/statusbanner (midtstilt) -->
@@ -142,8 +177,8 @@
   </div>
 
   <script>
-  // Overstyr for testing: sett til true for å åpne ALLE luker
-const DEBUG_ALWAYS_OPEN = false;  // endre til false når du går "live"
+// Overstyr for testing: sett til true for å åpne ALLE luker
+const DEBUG_ALWAYS_OPEN = true;  // endre til false når du går "live"
 
 // Dato-styrt åpning av luker
 function isDoorOpen(day){
@@ -157,8 +192,7 @@ function isDoorOpen(day){
   return d >= day;
 }
 
- // test: åpne t.o.m. 8. des.
-    const DATA_URLS = ['data/days.json','./data/days.json'];
+const DATA_URLS = ['data/days.json','./data/days.json'];
 
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modal-title');
@@ -170,6 +204,11 @@ function isDoorOpen(day){
     const infoText = document.getElementById('info-text');
     const infoBtn = document.getElementById('info-btn');
     const infoClose = document.getElementById('info-close');
+    const debugIndicator = document.getElementById('debug-indicator');
+
+    if (DEBUG_ALWAYS_OPEN && debugIndicator) {
+      debugIndicator.style.display = 'block';
+    }
 
     const INFO_TEXT = `Så gøy at du er inne i julekalenderen!
 
@@ -184,7 +223,6 @@ Her får du en salig blanding, og jeg fikk lyst til å legge inn noen ting som j
 
 GOD JUL!`;
 
-    // Formatterer tekst til avsnitt (alternativ 3)
     // Formatterer tekst til avsnitt (alternativ 3)
     function formatModalText(raw){
       if(!raw) return '';
@@ -216,8 +254,9 @@ GOD JUL!`;
     function placeholderDays(){
       return Array.from({length:24}, (_,i)=>({
         title: `${i+1}. desember`,
-        image: `assets/images/day${String(i+1).padStart(2,'0')}.webp`,
-        text: '', apple: '', spotify: ''
+        text: '',
+        apple: '',
+        spotify: ''
       }));
     }
 
